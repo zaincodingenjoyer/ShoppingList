@@ -10,8 +10,10 @@ class GroceryList extends StatefulWidget {
 }
 
 class _GroceryListState extends State<GroceryList> {
-  void _addItem(BuildContext context) {
-    Navigator.of(context).push(MaterialPageRoute(builder: (ctx) => NewItem()));
+  void _addItem() {
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (ctx) => const NewItem()));
   }
 
   @override
@@ -20,9 +22,7 @@ class _GroceryListState extends State<GroceryList> {
       //Indent
       appBar: AppBar(
         title: const Text('Your Grocieries'),
-        actions: [
-          IconButton(onPressed: _addItem(), icon: const Icon(Icons.add)),
-        ],
+        actions: [IconButton(onPressed: _addItem, icon: const Icon(Icons.add))],
       ),
       body: ListView.builder(
         itemCount: groceryItems.length,
