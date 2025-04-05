@@ -1,6 +1,8 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shopping_list/data/categories.dart';
+import 'package:shopping_list/data/dummy_items.dart';
+import 'package:shopping_list/models/category.dart';
+import 'package:shopping_list/models/grocery_item.dart';
 
 class NewItem extends StatefulWidget {
   const NewItem({super.key});
@@ -13,9 +15,22 @@ class NewItem extends StatefulWidget {
 
 class _NewItemState extends State<NewItem> {
   final _formkey = GlobalKey<FormState>();
+  var _enteredName = '';
+  var _enteredQuantity = 1;
+  var _selectedCategory = categories[Categories.vegetables]!;
 
   void _saveItem() {
-    _formkey.currentState!.validate();
+    if (_formkey.currentState!.validate()) {
+      _formkey.currentState!.save();
+    }
+    Navigator.of(context).pop(
+      GroceryItem(
+        id: DateTime.now().toString(),
+        name: _enteredName,
+        quantity: _enteredQuantity,
+        category: _selectedCategory,
+      ),
+    );
   }
 
   @override
@@ -44,7 +59,11 @@ class _NewItemState extends State<NewItem> {
                     return 'Must be between 1 and 50 Characters';
                   }
                   return null;
-                }, //adding func return a string
+                },
+                //adding func return a string
+                onSaved: (value) {
+                  _enteredName = value!;
+                },
               ),
               //Instead of text field
               Row(
@@ -56,7 +75,7 @@ class _NewItemState extends State<NewItem> {
                         label: Text('Quantity'),
                       ),
                       keyboardType: TextInputType.number,
-                      initialValue: '1',
+                      initialValue: _enteredQuantity.toString(),
                       validator: (value) {
                         //validate it if wrong basically
                         if (value == null ||
@@ -67,11 +86,15 @@ class _NewItemState extends State<NewItem> {
                         }
                         return null;
                       },
+                      onSaved: (value) {
+                        _enteredQuantity = int.parse(value!);
+                      },
                     ),
                   ),
                   SizedBox(width: 8),
                   Expanded(
                     child: DropdownButtonFormField(
+                      value: _selectedCategory,
                       items: [
                         for (final category in categories.entries)
                           DropdownMenuItem(
@@ -89,7 +112,12 @@ class _NewItemState extends State<NewItem> {
                             ),
                           ),
                       ],
-                      onChanged: (value) {},
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedCategory = value!;
+                          //State WILL Change>>>
+                        });
+                      },
                     ),
                   ),
                 ],
@@ -99,7 +127,12 @@ class _NewItemState extends State<NewItem> {
                 mainAxisAlignment: MainAxisAlignment.end,
 
                 children: [
-                  TextButton(onPressed: () {}, child: const Text('Reset All')),
+                  TextButton(
+                    onPressed: () {
+                      _formkey.currentState!.reset();
+                    },
+                    child: const Text('Reset All'),
+                  ),
                   ElevatedButton(
                     onPressed: _saveItem,
                     child: const Text('Add Item'),
